@@ -1,19 +1,23 @@
-import { allTextures } from "./textures";
-import { Dir } from "./types";
+import { allTextures, TextureKey } from "./textures";
+import { Dir, TileValue } from "./types";
+import { Field, FieldKey } from "./field";
 
 export type PacmanExtra = { moveDir: Dir };
 
 export type GameView = {
   pacman: { sprite: PIXI.Sprite, extra: PacmanExtra },
+  field: Field,
+  particles: { sprite: PIXI.Sprite, id: number }[],
+  currentParticleId: number,
 }
 
 export function pacmanLoc<S extends { x: number, y: number}>(
   sprite: S
-): { x: number, y: number } {
-  return {
-    x: Math.floor(sprite.x / 30),
-    y: Math.floor(sprite.y / 30),
-  }
+): [number, number] {
+  return [
+    Math.floor(sprite.x / 30),
+    Math.floor(sprite.y / 30),
+  ];
 }
 
 export function initialPacman(
@@ -35,6 +39,59 @@ export function initialView(
   container: PIXI.Container,
 ): GameView {
   return {
+    field: initialField(container),
     pacman: initialPacman(container),
+    particles: [],
+    currentParticleId: 0,
   };
+}
+
+export function initialField(
+  container: PIXI.Container,
+): Field {
+  function mkFieldSprite(value: TileValue, key: FieldKey): PIXI.Sprite {
+    const sprite = new PIXI.Sprite(allTextures[tileValueSprite(value)]);
+    sprite.x = key[0] * 30;
+    sprite.y = key[1] * 30;
+    sprite.pivot.set(tileOffset(value), tileOffset(value));
+    container.addChild(sprite);
+    return sprite;
+  }
+
+  const initialMap: Record<string, TileValue> = {};
+  initialMap[[0,1].toString()] = "dot";
+  initialMap[[3,3].toString()] = "dot";
+  initialMap[[4,3].toString()] = "dot";
+  initialMap[[5,3].toString()] = "dot";
+  initialMap[[6,3].toString()] = "dot";
+  initialMap[[5,5].toString()] = "wall";
+  initialMap[[6,5].toString()] = "wall";
+  initialMap[[5,6].toString()] = "wall";
+
+  let field: Field = {};
+  Object.entries(initialMap).forEach(([keyList, tileValue]) => {
+    const split = keyList.split(",", 2).map(x => Number.parseInt(x));
+    const key: [number, number] = [split[0], split[1]];
+    field[key.toString()] = { value: tileValue, sprite: mkFieldSprite(tileValue, key) };
+  });
+
+  return field;
+}
+
+export function tileValueSprite(
+  tileValue: TileValue
+): TextureKey {
+  switch (tileValue) {
+    case "wall": return "wall.png";
+    case "dot": return "dot1.png";
+  }
+}
+
+export function tileOffset(
+  tileValue: TileValue
+): number {
+  switch (tileValue) {
+    case "wall": return 10;
+    case "dot": return 5;
+  }
 }

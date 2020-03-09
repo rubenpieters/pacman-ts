@@ -1,7 +1,6 @@
 import * as PIXI from "pixi.js";
 
 import { gameLoop } from "./game";
-import { allTextures } from "./textures"
 import { initialView } from "./view";
 import { initialAnims } from "./anims";
 
@@ -13,10 +12,12 @@ function main(): void {
   document.body.appendChild(app.view);
 
   const container = new PIXI.Container();
+  container.x = 15;
+  container.y = 15;
   app.stage.addChild(container);
 
   const view = initialView(container);
   const anims = initialAnims();
 
-  requestAnimationFrame(gameLoop(view, anims));
+  requestAnimationFrame(gameLoop(view, anims, container));
 }

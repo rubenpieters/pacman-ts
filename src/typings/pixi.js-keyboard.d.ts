@@ -1,5 +1,7 @@
-declare module "pixi.js-keyboard"
+declare module "pixi.js-keyboard" {
+  function isKeyDown(
+    key: string,
+  ): boolean;
 
-declare function isKeyDown(
-  key: string,
-): boolean;
+  function update(): void;
+}

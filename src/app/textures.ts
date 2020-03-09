@@ -1,5 +1,5 @@
 export type AllTextures = typeof allTextures;
-export type TextureKeys = keyof AllTextures;
+export type TextureKey = keyof AllTextures;
 
 export const allTextures = {
   "100.png": PIXI.Texture.from("assets/sprites/100.png"),
