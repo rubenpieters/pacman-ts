@@ -1,11 +1,12 @@
 import { allTextures, TextureKey } from "./textures";
 import { Dir, TileValue } from "./types";
-import { Field, FieldKey } from "./field";
+import { Field, FieldKey, parseField } from "./field";
 
 export type PacmanExtra = { moveDir: Dir };
 
 export type GameView = {
   pacman: { sprite: PIXI.Sprite, extra: PacmanExtra },
+  ghost: { sprite: PIXI.Sprite },
   field: Field,
   particles: { sprite: PIXI.Sprite, id: number }[],
   currentParticleId: number,
@@ -35,12 +36,26 @@ export function initialPacman(
   return { sprite, extra };
 }
 
+export function initialGhost(
+  container: PIXI.Container,
+): {
+  sprite: PIXI.Sprite,
+} {
+  const sprite = new PIXI.Sprite(allTextures["ghost0.png"]);
+  sprite.x = 300;
+  sprite.y = 300;
+  sprite.pivot.set(15, 15);
+  container.addChild(sprite);
+  return { sprite };
+}
+
 export function initialView(
   container: PIXI.Container,
 ): GameView {
   return {
     field: initialField(container),
     pacman: initialPacman(container),
+    ghost: initialGhost(container),
     particles: [],
     currentParticleId: 0,
   };
@@ -58,15 +73,29 @@ export function initialField(
     return sprite;
   }
 
-  const initialMap: Record<string, TileValue> = {};
-  initialMap[[0,1].toString()] = "dot";
-  initialMap[[3,3].toString()] = "dot";
-  initialMap[[4,3].toString()] = "dot";
-  initialMap[[5,3].toString()] = "dot";
-  initialMap[[6,3].toString()] = "dot";
-  initialMap[[5,5].toString()] = "wall";
-  initialMap[[6,5].toString()] = "wall";
-  initialMap[[5,6].toString()] = "wall";
+  const initialMap: Record<string, TileValue> = parseField(
+    [ "wwwwwwwwwwwwwwwwwwww"
+    , "w........ww........w"
+    , "w...ww...ww....ww..w"
+    , "w...ww...ww....ww..w"
+    , "w..................w"
+    , "wwww..ww....ww..wwww"
+    , "wwww..ww....ww..wwww"
+    , "w.....ww....ww.....w"
+    , "w.....ww....ww.....w"
+    , "w..................w"
+    , "w.....ww....ww.....w"
+    , "wwww..ww....ww..wwww"
+    , "wwww..ww....ww..wwww"
+    , "w..................w"
+    , "w...w.........w....w"
+    , "w...w.wwwwwww.w....w"
+    , "w...w....ww...w....w"
+    , "w..wwwww.ww.wwww...w"
+    , "w..................w"
+    , "wwwwwwwwwwwwwwwwwwww"
+    ]  
+  );
 
   let field: Field = {};
   Object.entries(initialMap).forEach(([keyList, tileValue]) => {

@@ -26,3 +26,33 @@ export function tileInDir(
     case "right": return tileValue(field, [loc[0] + 1, loc[1]]);
   }
 }
+
+export function parseField(
+  l: string[]
+): Record<string, TileValue> {
+  let rowId = 0;
+  let colId = 0;
+  let field: Record<string, TileValue> = {};
+  for (const str of l) {
+    for (const c of str) {
+      const v = parseChar(c);
+      if (v !== undefined) {
+        field[[colId, rowId].toString()] = v;
+      }
+      colId++;
+    }
+    colId = 0;
+    rowId++;
+  }
+  return field;
+}
+
+export function parseChar(
+  c: string,
+): TileValue | undefined {
+  switch (c) {
+    case "w": return "wall";
+    case ".": return "dot";
+    default: return undefined;
+  }
+}
