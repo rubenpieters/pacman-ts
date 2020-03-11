@@ -28,6 +28,7 @@ export function initialPacman(
   extra: PacmanExtra,
 } {
   const sprite = new PIXI.Sprite(allTextures["pacman0.png"]);
+  sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
   sprite.x = 60;
   sprite.y = 60;
   sprite.pivot.set(15, 15);
@@ -42,9 +43,12 @@ export function initialGhost(
   sprite: PIXI.Sprite,
 } {
   const sprite = new PIXI.Sprite(allTextures["ghost0.png"]);
-  sprite.x = 300;
-  sprite.y = 300;
-  sprite.pivot.set(15, 15);
+  sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+  sprite.x = 540;
+  sprite.y = 540;
+  sprite.width = 30;
+  sprite.height = 30;
+  sprite.pivot.set(10, 9);
   container.addChild(sprite);
   return { sprite };
 }
@@ -66,6 +70,7 @@ export function initialField(
 ): Field {
   function mkFieldSprite(value: TileValue, key: FieldKey): PIXI.Sprite {
     const sprite = new PIXI.Sprite(allTextures[tileValueSprite(value)]);
+    sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     sprite.x = key[0] * 30;
     sprite.y = key[1] * 30;
     sprite.pivot.set(tileOffset(value), tileOffset(value));

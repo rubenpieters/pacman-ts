@@ -4,8 +4,6 @@ import { gameLoop } from "./game";
 import { initialView } from "./view";
 import { initialAnims } from "./anims";
 
-PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-
 window.addEventListener("load", main);
 
 function main(): void {

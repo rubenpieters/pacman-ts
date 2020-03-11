@@ -1,9 +1,9 @@
 import { GameView } from "./view";
 import * as V from "./view";
 import { GameAnims } from "./anims";
-import { pacmanMove, pacmanRotate, dotAnim, readyAnim } from "./animDefs";
+import { pacmanMove, pacmanRotate, dotAnim, readyAnim, ghostMove } from "./animDefs";
 import Keyboard from "pixi.js-keyboard";
-import { tileValue, tileInDir } from "./field";
+import { tileValue, tileInDir, nonWallDirs } from "./field";
 
 export function gameLoop(
   view: GameView,
@@ -31,6 +31,7 @@ export function gameLoop(
       const dPressed = Keyboard.isKeyDown("KeyD");
       // info
       const pacmanLoc = V.pacmanLoc(view.pacman.sprite);
+      const ghostLoc = V.pacmanLoc(view.ghost.sprite);
       const thisTile = tileValue(view.field, pacmanLoc);
       const nextTile = tileInDir(pacmanLoc, view.pacman.extra.moveDir, view.field);
       const eatDot = thisTile === "dot";
@@ -53,10 +54,7 @@ export function gameLoop(
         dotAnim(view, container, view.pacman.sprite.x, view.pacman.sprite.y).play();
       }
       // update move animations
-      if (anims.pacmanMoveAnims !== undefined && ! anims.pacmanMoveAnims.isActive()) {
-        anims.pacmanMoveAnims = undefined;
-      }
-      if (anims.pacmanMoveAnims === undefined) {
+      if (anims.pacmanMoveAnims === undefined || ! anims.pacmanMoveAnims.isActive()) {
         if (nextTile === "wall") {
           const anim = pacmanRotate(view);
           anims.pacmanMoveAnims = anim;
@@ -67,8 +65,22 @@ export function gameLoop(
           anim.play();
         }
       }
-  
+      if (anims.ghostMoveAnims === undefined || ! anims.ghostMoveAnims.isActive()) {
+        const possibleDirs = nonWallDirs(view.field, ghostLoc);
+        const randomIndex = getRandomInt(0, possibleDirs.length - 1);
+        const randomDir = possibleDirs[randomIndex];
+        const anim = ghostMove(view, randomDir);
+        anims.ghostMoveAnims = anim;
+        anim.play();
+      }
+
       requestAnimationFrame(gameLoop(view, anims, container));
     }
   };
+}
+
+function getRandomInt(min: number, max: number) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

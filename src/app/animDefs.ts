@@ -29,6 +29,18 @@ export function pacmanMove(
   return anim;
 }
 
+export function ghostMove(
+  view: GameView,
+  dir: Dir,
+): GSAP.Timeline {
+  const current = view.ghost.sprite[moveLens(dir)];
+  const newValue = current + moveOffset(dir);
+  const anim = new GSAP.TimelineMax({ paused: true })
+    .add(new GSAP.TweenMax(view.ghost.sprite, 0.2, { [moveLens(dir)]: newValue, ease: GSAP.Linear.easeNone }), 0)
+    ;
+  return anim;
+}
+
 function moveLens(
   dir: Dir,
 ): "x" | "y" {
@@ -134,6 +146,7 @@ function createParticle(
 ): number {
   const currentId = view.currentParticleId;
   const particle = new PIXI.Sprite(allTextures[texture]);
+  particle.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
   particle.x = x;
   particle.y = y;
   particle.width = width;

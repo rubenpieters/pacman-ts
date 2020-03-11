@@ -14,17 +14,36 @@ export function tileValue(
   return undefined;
 }
 
+export function locInDir(
+  loc: FieldKey,
+  dir: Dir,
+): [number, number] {
+  switch (dir) {
+    case "up": return [loc[0], loc[1] - 1];
+    case "down": return [loc[0], loc[1] + 1];
+    case "left": return [loc[0] - 1, loc[1]];
+    case "right": return [loc[0] + 1, loc[1]];
+  }
+}
+
 export function tileInDir(
   loc: FieldKey,
   dir: Dir,
   field: Field,
 ): TileValue | undefined {
-  switch (dir) {
-    case "up": return tileValue(field, [loc[0], loc[1] - 1]);
-    case "down": return tileValue(field, [loc[0], loc[1] + 1]);
-    case "left": return tileValue(field, [loc[0] - 1, loc[1]]);
-    case "right": return tileValue(field, [loc[0] + 1, loc[1]]);
-  }
+  return tileValue(field, locInDir(loc, dir));
+}
+
+export function nonWallDirs(
+  field: Field,
+  loc: FieldKey,
+) {
+  const dirs: Dir[] = ["up", "down", "left", "right"];
+  return dirs
+    .map(d => { return { dir: d, val: tileInDir(loc, d, field) } })
+    .filter(({ val }) => val !== "wall")
+    .map(({ dir }) => dir)
+    ;
 }
 
 export function parseField(
