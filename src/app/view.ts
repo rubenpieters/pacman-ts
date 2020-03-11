@@ -1,8 +1,12 @@
 import { allTextures, TextureKey } from "./textures";
 import { Dir, TileValue } from "./types";
 import { Field, FieldKey, parseField } from "./field";
+import { Container } from "pixi.js";
 
-export type PacmanExtra = { moveDir: Dir };
+export type PacmanExtra = {
+  moveDir: Dir,
+  alive: boolean,
+};
 
 export type GameView = {
   pacman: { sprite: PIXI.Sprite, extra: PacmanExtra },
@@ -33,7 +37,7 @@ export function initialPacman(
   sprite.y = 60;
   sprite.pivot.set(15, 15);
   container.addChild(sprite);
-  const extra: PacmanExtra = { moveDir: "right" };
+  const extra: PacmanExtra = { moveDir: "right", alive: true };
   return { sprite, extra };
 }
 
@@ -56,14 +60,41 @@ export function initialGhost(
 export function initialView(
   container: PIXI.Container,
 ): GameView {
+  const field = initialField(container);
+  const ghost = initialGhost(container);
+  const pacman = initialPacman(container);
   return {
-    field: initialField(container),
-    pacman: initialPacman(container),
-    ghost: initialGhost(container),
+    field,
+    ghost,
+    pacman,
     particles: [],
     currentParticleId: 0,
   };
 }
+
+const initialMap: Record<string, TileValue> = parseField(
+  [ "wwwwwwwwwwwwwwwwwwww"
+  , "w........ww........w"
+  , "w...ww...ww....ww..w"
+  , "w...ww...ww....ww..w"
+  , "w..................w"
+  , "wwww..ww....ww..wwww"
+  , "wwww..ww....ww..wwww"
+  , "w.....ww....ww.....w"
+  , "w.....ww....ww.....w"
+  , "w..................w"
+  , "w.....ww....ww.....w"
+  , "wwww..ww....ww..wwww"
+  , "wwww..ww....ww..wwww"
+  , "w..................w"
+  , "w...w.........w....w"
+  , "w...w.wwwwwww.w....w"
+  , "w...w....ww...w....w"
+  , "w..wwwww.ww.wwww...w"
+  , "w..................w"
+  , "wwwwwwwwwwwwwwwwwwww"
+  ]
+);
 
 export function initialField(
   container: PIXI.Container,
@@ -77,30 +108,6 @@ export function initialField(
     container.addChild(sprite);
     return sprite;
   }
-
-  const initialMap: Record<string, TileValue> = parseField(
-    [ "wwwwwwwwwwwwwwwwwwww"
-    , "w........ww........w"
-    , "w...ww...ww....ww..w"
-    , "w...ww...ww....ww..w"
-    , "w..................w"
-    , "wwww..ww....ww..wwww"
-    , "wwww..ww....ww..wwww"
-    , "w.....ww....ww.....w"
-    , "w.....ww....ww.....w"
-    , "w..................w"
-    , "w.....ww....ww.....w"
-    , "wwww..ww....ww..wwww"
-    , "wwww..ww....ww..wwww"
-    , "w..................w"
-    , "w...w.........w....w"
-    , "w...w.wwwwwww.w....w"
-    , "w...w....ww...w....w"
-    , "w..wwwww.ww.wwww...w"
-    , "w..................w"
-    , "wwwwwwwwwwwwwwwwwwww"
-    ]  
-  );
 
   let field: Field = {};
   Object.entries(initialMap).forEach(([keyList, tileValue]) => {
@@ -128,4 +135,25 @@ export function tileOffset(
     case "wall": return 10;
     case "dot": return 5;
   }
+}
+
+export function resetView(
+  view: GameView,
+  container: Container,
+) {
+  view.pacman.sprite.x = 60;
+  view.pacman.sprite.y = 60;
+  view.pacman.sprite.angle = 0;
+  view.pacman.sprite.texture = allTextures["pacman0.png"];
+  view.pacman.extra = { moveDir: "right", alive: true };
+  view.ghost.sprite.x = 540;
+  view.ghost.sprite.y = 540;
+  view.particles.forEach(p => {
+    container.removeChild(p.sprite);
+  });
+  view.particles = [];
+  for (const k in view.field) {
+    container.removeChild(view.field[k].sprite);
+  }
+  view.field = initialField(container);
 }

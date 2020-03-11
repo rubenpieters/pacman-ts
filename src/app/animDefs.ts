@@ -41,6 +41,16 @@ export function ghostMove(
   return anim;
 }
 
+export function deathAnim(
+  view: GameView,
+): GSAP.Timeline {
+  const l: TextureKey[] = ["pacman1.png", "pacman2.png", "pacman1.png", "pacman2.png"];
+  const anim = new GSAP.TimelineMax({ paused: true })
+    .add(frameByFrame(view.pacman.sprite, 0.2, l). play(), 0)
+    ;
+  return anim;
+}
+
 function moveLens(
   dir: Dir,
 ): "x" | "y" {
