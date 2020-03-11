@@ -57,19 +57,23 @@ export function initialGhost(
   return { sprite };
 }
 
+function initializeView(
+  view: GameView,
+  container: PIXI.Container,
+) {
+  view.field = initialField(container);
+  view.ghost = initialGhost(container);
+  view.pacman = initialPacman(container);
+  view.particles = [];
+  view.currentParticleId = 0;
+}
+
 export function initialView(
   container: PIXI.Container,
 ): GameView {
-  const field = initialField(container);
-  const ghost = initialGhost(container);
-  const pacman = initialPacman(container);
-  return {
-    field,
-    ghost,
-    pacman,
-    particles: [],
-    currentParticleId: 0,
-  };
+  const view: GameView = {} as any;
+  initializeView(view, container);
+  return view;
 }
 
 const initialMap: Record<string, TileValue> = parseField(
@@ -141,13 +145,8 @@ export function resetView(
   view: GameView,
   container: Container,
 ) {
-  view.pacman.sprite.x = 60;
-  view.pacman.sprite.y = 60;
-  view.pacman.sprite.angle = 0;
-  view.pacman.sprite.texture = allTextures["pacman0.png"];
-  view.pacman.extra = { moveDir: "right", alive: true };
-  view.ghost.sprite.x = 540;
-  view.ghost.sprite.y = 540;
+  container.removeChild(view.pacman.sprite);
+  container.removeChild(view.ghost.sprite);
   view.particles.forEach(p => {
     container.removeChild(p.sprite);
   });
@@ -155,5 +154,5 @@ export function resetView(
   for (const k in view.field) {
     container.removeChild(view.field[k].sprite);
   }
-  view.field = initialField(container);
+  initializeView(view, container);
 }
