@@ -1,5 +1,5 @@
 {
-  "name": "roh-tah-sie",
+  "name": "pacman-ts",
   "version": "0.0.1",
   "engines": {
     "node": "6.9.1"
@@ -7,7 +7,7 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rubenpieters/RohTahSie"
+    "url": "https://github.com/rubenpieters/pacman-ts"
   },
   "license": "MIT",
   "author": "rubenpieters",
